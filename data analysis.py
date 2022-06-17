@@ -267,3 +267,57 @@ plt.subplots_adjust(left=0.125,
                     wspace=0.2, 
                     hspace=0.1)    
 plt.show()
+
+sum =  df_students[df_students['PcD']==False]['número de mensagens'].sum()
+stu = df_students[df_students['PcD']==False]['id'].nunique()
+print(sum,stu)
+
+pcd_type = deficiency_type.to_frame(name='mensagens')
+pcd_type['alunos'] = def_count
+non_pcd = pd.DataFrame({'mensagens':sum, 'alunos': stu},index = ['Não-PcD'])
+pcd_type = pcd_type.append(non_pcd)
+pcd_type['mensagens/aluno'] = pcd_type['mensagens']/pcd_type['alunos']
+pcd_type.sort_values(by='alunos', ascending=False).round(1)
+
+plt.style.use('default')
+#plt.style.use('bmh')
+sns.set(style="darkgrid")
+
+pcd_type = deficiency_type.to_frame(name='mensagens')
+pcd_type['alunos'] = def_count
+non_pcd = pd.DataFrame({'mensagens':sum, 'alunos': stu},index = ['Não-PcD'])
+pcd_type = pcd_type.append(non_pcd)
+pcd_type['mensagens/aluno'] = pcd_type['mensagens']/pcd_type['alunos']
+pcd_type = pcd_type.sort_values(by='mensagens/aluno', ascending=False).round(1)
+pcd_type.reset_index(inplace=True)
+cols = list(pcd_type.columns)
+cols[0] = 'Tipo de deficiência'
+pcd_type.columns = cols
+#pcd_type
+plt.figure(figsize=(10,4))
+plt.xticks(values, labels, rotation='vertical')
+g = sns.barplot(x='Tipo de deficiência',y = 'mensagens/aluno',data=pcd_type, color = 'C1')
+for p in g.patches:
+    g.annotate(format(p.get_height(), '.1f'), (p.get_x() + p.get_width() / 2., 
+                                               p.get_height()), ha = 'center', 
+               va = 'center', xytext = (0, 5), textcoords = 'offset points')
+
+plt.figure(figsize=(10,4))
+plt.xticks(values, labels, rotation='60')
+g = sns.barplot(y='Tipo de deficiência',x = 'mensagens/aluno',data=pcd_type, color = 'C1')
+for p in g.patches:
+        g.annotate(format(p.get_width(), '.1f'), (p.get_width(), 
+                                                    p.get_y() + p.get_height()/2.), ha = 'center', 
+                    va = 'center', xytext = (15, 0), textcoords = 'offset points')
+
+# estatisticas
+df_students_statistics = df_students[df_students['PcD']==False].describe()['número de mensagens'].to_frame()
+df_students_statistics['PcD'] = df_students[df_students['PcD']==True].describe()['número de mensagens']
+df_students_statistics.columns = ['Não-PcD','PcD']
+df_students_statistics.round(2)
+#df_students_statistics = df_students_statistics.transpose()
+#df_students_statistics.style.background_gradient(cmap ='Blues')
+
+plt.figure(figsize=(8,8))
+plt.title('Distribuições de mensagens por aluno')
+sns.boxplot(x="PcD", y="número de mensagens", palette=['C0','C1'], data=df_students) #['C2','C5']
