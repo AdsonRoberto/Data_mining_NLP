@@ -321,3 +321,60 @@ df_students_statistics.round(2)
 plt.figure(figsize=(8,8))
 plt.title('Distribuições de mensagens por aluno')
 sns.boxplot(x="PcD", y="número de mensagens", palette=['C0','C1'], data=df_students) #['C2','C5']
+
+#Mensagens enviadas pelo chatbot
+
+import re
+def generalize(text):
+  # 307725127
+  student_regex = '\d\d\d\d\d\d\d\d\d'
+  return None
+
+def truncate(text, threshold = 6):
+  words = text.split()
+  trunc_words = words[0:threshold]
+  text = ' '.join(trunc_words)
+  if len(words) > threshold:
+     text = text + '...'
+  return text
+
+  sns.set(style="whitegrid")
+plt.style.use('bmh')
+df_stuart = df[df['autor_da_mensagem']=='STUART']
+df_stuart['mensagem'] = [text.replace('CHAT.STUART_INFORMATION_USEFUL','Recomendação') for text in df_stuart['mensagem']]
+#df_stuart['mensagem_geral'] = []
+
+msgs_stuart = df_stuart['mensagem'].value_counts()
+print('Total de mensagens únicas do STUART:', len(msgs_stuart))
+top_stuart = msgs_stuart[1:10]
+trunc_msg = [truncate(t,10) for t in top_stuart.index]
+
+plt.figure(figsize=(8,8))
+#plt.title('Mensagens mais frequentes do STUART')
+g = sns.barplot(x=top_stuart.values,y=trunc_msg, color = 'C0')
+for p in g.patches:
+    g.annotate(format(p.get_width(), '.0f'), (p.get_width(), 
+                                               p.get_y() + p.get_height()/2.), ha = 'center', 
+               va = 'center', xytext = (15, 0), textcoords = 'offset points')
+
+sns.set(style="whitegrid")
+plt.style.use('bmh')
+df_stuart = df[df['autor_da_mensagem']=='STUART']
+df_stuart['mensagem'] = [text.replace('CHAT.STUART_INFORMATION_USEFUL','Recomendação') for text in df_stuart['mensagem']]
+df_stuart['mensagem'] = [text.replace('CHAT.STUART_STUDENT_SATISFACTION','Recomendação') for text in df_stuart['mensagem']]
+#df_stuart['mensagem_geral'] = []
+
+msgs_stuart = df_stuart['mensagem'].value_counts()
+print('Total de mensagens únicas do STUART:', len(msgs_stuart))
+top_stuart = msgs_stuart[5:15]
+trunc_msg = [truncate(t,10) for t in top_stuart.index]
+
+plt.figure(figsize=(8,8))
+#plt.title('Mensagens mais frequentes do STUART')
+g = sns.barplot(x=top_stuart.values,y=trunc_msg, color = 'C0')
+for p in g.patches:
+    g.annotate(format(p.get_width(), '.0f'), (p.get_width(), 
+                                               p.get_y() + p.get_height()/2.), ha = 'center', 
+               va = 'center', xytext = (15, 0), textcoords = 'offset points')
+              
+top_stuart
