@@ -378,3 +378,14 @@ for p in g.patches:
                va = 'center', xytext = (15, 0), textcoords = 'offset points')
               
 top_stuart
+
+#analise das respostas de duvidas de conteudo dos alunos
+counter = 0
+for msg in list(df_stuart['mensagem']):
+  if 'se quiser saber mais' in msg.lower() or 'veja' in msg.lower() or 'look what'in msg.lower():
+    counter+=1
+    print(msg)
+
+print(counter)
+print('Dúvidas sobre conteúdo foram utilizadas {a:1d} vezes'.format(a=counter))
+print(counter/len(df)*100)
