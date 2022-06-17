@@ -175,3 +175,95 @@ top_student_pcd.head(1)
 
 list(top_student_pcd['mensagem'])
 
+# plot all together
+
+#plt.style.use('default')
+plt.style.use('bmh')
+sns.set(style="darkgrid")
+
+# prepare data
+df_students_msgs = df[df['autor_da_mensagem'] !='STUART'] 
+
+# students
+pcds = df_students_msgs[df_students_msgs['deficiencia'] != 'Nenhuma']
+not_pcd = df_students_msgs[(df_students_msgs['deficiencia'] == 'Nenhuma')]
+n_msgs = [pcds['remetente'].nunique(), not_pcd['remetente'].nunique()]
+pcd_label = ['PcD','Não PcD']
+
+# type of deficency
+deficiency_type = pcds['deficiencia'].value_counts()
+def_count = []
+for deficiency in deficiency_type.index:
+  count = pcds[pcds['deficiencia']==deficiency]['remetente'].nunique()
+  def_count.append(count)
+
+def_type = deficiency_type.index
+
+# messages
+pcd_msgs = len(df_students_msgs[df_students_msgs['deficiencia'] != 'Nenhuma'])
+non_pcd_msgs = len(df_students_msgs[(df_students_msgs['deficiencia'] == 'Nenhuma')])
+msgs_pcd = [pcd_msgs, non_pcd_msgs]
+msgs_pcd_labels = ['PcD','Não PcD']
+
+# subplots
+plt.figure(figsize=(15,12))
+
+# barras alunos
+plt.subplot(321)
+plt.title('Alunos')
+g = sns.barplot(x=pcd_label, y=n_msgs, palette= ['C2','C5'])
+for p in g.patches:
+    g.annotate(format(p.get_height(), '.0f'), (p.get_x() + p.get_width() / 2., 
+                                               p.get_height()), ha = 'center', 
+               va = 'center', xytext = (0, 5), textcoords = 'offset points')
+
+# barras mensagens
+plt.subplot(322)
+plt.title('Mensagens')
+g = sns.barplot(x=msgs_pcd_labels, y=msgs_pcd, palette= ['C6','C7'])
+for p in g.patches:
+    g.annotate(format(p.get_height(), '.0f'), (p.get_x() + p.get_width() / 2., 
+                                               p.get_height()), ha = 'center', 
+               va = 'center', xytext = (0, 5), textcoords = 'offset points')
+
+#donnut alunos
+plt.subplot(323)
+my_circle=plt.Circle( (0,0), 0.6, color='white')
+plt.pie(n_msgs, labels=pcd_label, autopct='%1.1f%%',startangle=90, pctdistance=0.4, colors = ['C2','C5'])
+p=plt.gcf()
+p.gca().add_artist(my_circle)
+
+# donnut mensagens
+plt.subplot(324)
+my_circle=plt.Circle( (0,0), 0.6, color='white')
+plt.pie(msgs_pcd, labels=msgs_pcd_labels, autopct='%1.1f%%',startangle=90, pctdistance=0.4, colors = ['C6','C7'])
+p=plt.gcf()
+p.gca().add_artist(my_circle)
+
+# barras deficiencia alunos
+plt.subplot(325)
+plt.xticks(values, labels, rotation='vertical')
+plt.title('Quantidade de alunos por tipo de deficiência')
+g = sns.barplot(x=def_type, y=def_count, color= 'C4')
+for p in g.patches:
+    g.annotate(format(p.get_height(), '.0f'), (p.get_x() + p.get_width() / 2., 
+                                               p.get_height()), ha = 'center', 
+               va = 'center', xytext = (0, 5), textcoords = 'offset points')
+    
+# barras deficiencia mensagens
+plt.subplot(326)
+plt.xticks(values, labels, rotation='vertical')
+plt.title('Quantidade de mensagens por tipo de deficiência')
+g = sns.barplot(x=deficiency_type.index, y=deficiency_type.values, color= 'C1')
+for p in g.patches:
+    g.annotate(format(p.get_height(), '.0f'), (p.get_x() + p.get_width() / 2., 
+                                               p.get_height()), ha = 'center', 
+               va = 'center', xytext = (0, 5), textcoords = 'offset points')
+    
+plt.subplots_adjust(left=0.125,
+                    bottom=0.1, 
+                    right=0.95, 
+                    top=0.95, 
+                    wspace=0.2, 
+                    hspace=0.1)    
+plt.show()
