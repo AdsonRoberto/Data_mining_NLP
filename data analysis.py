@@ -31,3 +31,23 @@ import seaborn as sns
 import plotly.express as px
 import re, os
 from statsmodels.tsa.seasonal import seasonal_decompose
+
+%matplotlib inline
+sns.set(style="whitegrid")
+#pd.set_option('display.max_colwidth', None)
+
+#load all files
+files_path = '/content/drive/MyDrive/Mineracao/Logs' 
+files_list = os.listdir(files_path)
+dfs = []
+for log in files_list:
+  print(log)
+  file_path = files_path + '/' + log
+  df = pd.read_csv(file_path, error_bad_lines=False, sep=',')
+  dfs.append(df)
+df = pd.concat(dfs)
+
+# ordem cronológica
+df['data_hora_mensagem'] = pd.to_datetime(df['data_hora_mensagem'])
+df = df.sort_values(by='data_hora_mensagem')
+df.head(3)
