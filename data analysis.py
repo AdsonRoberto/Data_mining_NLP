@@ -419,5 +419,120 @@ fig = px.line(df_timeseries, x='timestamp', y='remetente',
               color="autor", line_group="autor", hover_name="autor")
 fig.show()
 
+#Análise linguística das mensagens enviadas por alunos
+
+from sklearn.feature_extraction.text import CountVectorizer
+import nltk
+from nltk.corpus import stopwords
+import string
+import spacy
+
+nltk.download('stopwords')
+#!python -m spacy download pt
+
+punct = list(string.punctuation)
+
+def get_top_n_ngrams(corpus, ngram = (1,1), n=None, reverse = True):
+    if type(corpus) == str:
+        corpus = [corpus]
+    vec = CountVectorizer(ngram_range = ngram).fit(corpus)
+    bag_of_words = vec.transform(corpus)
+    sum_words = bag_of_words.sum(axis=0) 
+    words_freq = [(word, sum_words[0, idx]) for word, idx in vec.vocabulary_.items()]
+    words_freq =sorted(words_freq, key = lambda x: x[1], reverse=reverse)
+    return words_freq[:n]
+
+def build_ngram_df(corpus, ngram = (1,1), n=None, ascend = False):
+    reverse = not(ascend)
+    ngrams = get_top_n_ngrams(corpus, ngram, n, reverse = reverse)
+    df1 = pd.DataFrame(ngrams, columns = ['ngrams' , 'count'])
+    df1 = df1.groupby('ngrams').sum()['count'].sort_values(ascending=ascend)
+    return df1
+
+def plotNgrams(ngrams, col = 'C0', orientation = 'vertical'):
+    labels = list(ngrams.index)
+    values = list(ngrams.values)
+    #
+    if orientation == 'vertical':
+        g = sns.barplot(y=labels, x=values, color = col)
+        for p in g.patches:
+            g.annotate(format(p.get_width(), '.0f'), (p.get_width(), 
+                                                       p.get_y() + p.get_height()/2.), ha = 'center', 
+                       va = 'center', xytext = (15, 0), textcoords = 'offset points')
+    else:
+        plt.xticks(values, labels, rotation='vertical')
+        g = sns.barplot(x=labels, y=values, color = col) 
+        for p in g.patches:
+            g.annotate(format(p.get_height(), '.0f'), (p.get_x() + p.get_width() / 2., 
+                                                       p.get_height()), ha = 'center', 
+                       va = 'center', xytext = (0, 5), textcoords = 'offset points')
+            
+# remoção de stop words
+stop_words = list(stopwords.words('portuguese'))
+stop_words = stop_words + ['pra', 'como', 'ola', 'olá', 'oi', 'oii'] #, 'obrigado', 'obrigada','ok']
+
+def remove_punctuation(text):
+  for p in punct:
+    text = text.replace(p,'')
+  return text
+  
+def remove_stopwords(text):
+    words = text.split()
+    # [f(x) for x in sequence if condition]
+    words = [w for w in words if w not in stop_words]
+    text = ' '.join(words)
+    return text
+
+def remove_greetings(text):
+  greetings_list = ['bom dia','boa tarde', 'boa noite', 'thank you']
+  for g in greetings_list:
+    text = text.replace(g,'')
+  return text
+
+#lemmatization
+# nlp = spacy.load('pt')
+def lemmatization(text):    
+    doc = nlp(text)
+    for token in doc:
+        if token.text != token.lemma_:
+            text = text.replace(token.text, token.lemma_)
+    return text
+
+
+
+def preprocess(text):
+  text = text.lower()
+  text = remove_punctuation(text)
+  #text = remove_greetings(text)
+  text = remove_stopwords(text)
+  #text = lemmatization(text)
+  return text
+
+msgs_students = df[df['autor_da_mensagem'] !='STUART']['mensagem'].dropna()
+
+preprocessed = [preprocess(t) for t in msgs_students]
+
+total = ' '.join(list(preprocessed))
+plt.figure(figsize=(20, 10))
+plt.title('Top palavras mais frequentes nas mensagens enviadas por alunos')
+total_bigrams = build_ngram_df(total, ngram = (1,1), n=20)
+plotNgrams(total_bigrams, col='C7', orientation = 'vertical')
+plt.show()
+
+msgs_students = df[df['autor_da_mensagem'] !='STUART']['mensagem'].dropna()
+
+preprocessed = [preprocess(t) for t in msgs_students]
+
+total = ' '.join(list(preprocessed))
+print('palavras usadas somente uma vez por alunos')
+#plt.figure(figsize=(20, 10))
+#plt.title('Palavras menos frequentes nas mensagens enviadas por alunos')
+total_bigrams = build_ngram_df(total, ngram = (1,1), n=30, ascend=True)
+#total_bigrams
+#plotNgrams(total_bigrams, col='C8', orientation = 'vertical')
+#plt.show()
+
+
+
 
 
