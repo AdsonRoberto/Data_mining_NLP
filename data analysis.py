@@ -994,6 +994,20 @@ text = 'CHAT.STUART_INFORMATION_USEFUL'
 df[df['mensagem']=='CHAT.STUART_INFORMATION_USEFUL']
 
 
+#Segmentação de conversas
+
+def get_student_id(sender, reciever, author):
+  if author == 'STUART':
+    return reciever
+  else:
+    return sender
+#df['CustomRating'] = df.apply(lambda x: custom_rating(x['Genre'],x['Rating']),axis=1)
+df['id_aluno'] = df.apply(lambda x: get_student_id(x['remetente'], x['destinatario'], x['autor_da_mensagem']), axis = 1)
+
+df.groupby(by=['id_aluno']).count()['remetente'].sort_values(ascending=False)
+
+
+
 
 
 
