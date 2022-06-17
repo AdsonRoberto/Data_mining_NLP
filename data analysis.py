@@ -96,3 +96,25 @@ print('Total de mensagens nulas: {a:1d}'.format(a=nans))
 print('Porcentagem de mensagens nulas: {a:.2f}%'.format(a=nan_ratio))
 
 df[df['autor_da_mensagem']!='STUART']['remetente'].nunique()
+
+#Remetentes
+stuart_msgs = len(df[df['autor_da_mensagem']=='STUART'])
+users_msgs = len(df[df['autor_da_mensagem']=='USUÁRIO'])
+
+#plt.style.use('default')
+plt.style.use('bmh')
+values = [stuart_msgs, users_msgs]
+labels = ['STUART','Usuários']
+
+annotate_barchart(values,labels,title='Quantidade de mensagens')
+donnut(values, labels)
+values
+
+active_students = set(df[df['autor_da_mensagem']!='STUART']['remetente'])
+total_studentes = active_students.union(set(df[df['autor_da_mensagem']=='STUART']['destinatario']))
+values = [len(active_students), len(total_studentes)]
+labels = ['alunos que enviaram mensagens para o STUART', 'alunos que o stuart interagiu']
+donnut(values, labels)
+
+print('mensagens únicas do stuart')
+df[df['autor_da_mensagem']=='STUART']['mensagem'].nunique()
