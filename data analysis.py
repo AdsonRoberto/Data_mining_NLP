@@ -155,3 +155,23 @@ df_students = pd.DataFrame({'id':ids, 'número de mensagens': n_messages, 'defic
 plt.figure(figsize=(15,10))
 plt.title('Quantidade de mensagens por aluno')
 sns.swarmplot(x="PcD", y="número de mensagens", palette=['C0','C1'],size=6, data=df_students) #['C2','C5']
+
+
+#Estudante que mais enviou msg p chatbot
+top_student = df[df['remetente']==students_IDs[1]] 
+top_student.head(1)
+
+print('Mensagens quebradas')
+list(top_student['mensagem'])
+
+#id tutores
+tutores = {355074062, 276365414, 395739605}
+daniel = 395739605
+
+#pcd que mais enviou msg
+pcd_series = df[df['deficiencia'] != 'Nenhuma'].groupby('remetente').count().sort_values(by='autor_da_mensagem', ascending=False)['autor_da_mensagem']
+top_student_pcd = df[df['remetente']==pcd_series.index[0]] 
+top_student_pcd.head(1)
+
+list(top_student_pcd['mensagem'])
+
