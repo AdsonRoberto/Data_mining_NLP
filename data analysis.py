@@ -22,3 +22,12 @@ drive.mount('/content/drive', force_remount=True)
 from unidecode import unidecode 
 
 !python3 -m spacy download pt
+
+import pandas as pd
+import datetime
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.express as px
+import re, os
+from statsmodels.tsa.seasonal import seasonal_decompose
