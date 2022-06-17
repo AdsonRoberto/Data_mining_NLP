@@ -118,3 +118,40 @@ donnut(values, labels)
 
 print('mensagens únicas do stuart')
 df[df['autor_da_mensagem']=='STUART']['mensagem'].nunique()
+
+#Mensagens enviadas por estudantes
+
+students_series = df.groupby('remetente').count().sort_values(by='autor_da_mensagem', ascending=False)['autor_da_mensagem'][1:]
+print('Quantidade de estudantes:',len(students_series))
+print('Média de mensagens por estudante:',students_series.mean())
+
+top_students = students_series[0:100]
+students_IDs = list(top_students.index)
+labels = [str(a) for a in students_IDs]
+values = top_students.values
+annotate_barchart(values, labels, title = 'Top 100 estudantes que enviaram mais mensagens', size = (30,10), col='C9', rotate_xticks=True)
+
+
+ids = students_series.index
+n_messages = students_series.values
+deficiency = []
+pcd_bool = []
+for id in ids:
+  id_def = df[df['remetente']==id]['deficiencia'].unique()[0]
+  deficiency.append(id_def)
+  if id_def == 'Nenhuma':
+    pcd_bool.append(False)
+  else:
+    pcd_bool.append(True)
+
+df_students = pd.DataFrame({'id':ids, 'número de mensagens': n_messages, 'deficiencia': deficiency, 'PcD': pcd_bool})
+
+# swarmplot
+#sns.set(style="darkgrid")
+
+#plt.style.use('default')
+#plt.style.use('bmh')
+
+plt.figure(figsize=(15,10))
+plt.title('Quantidade de mensagens por aluno')
+sns.swarmplot(x="PcD", y="número de mensagens", palette=['C0','C1'],size=6, data=df_students) #['C2','C5']
