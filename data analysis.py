@@ -856,7 +856,108 @@ print()
 for p in list(sol.sample(100)):
   print(p)
 
-  
+
+#Amostragem de dúvidas
+
+sample = list(req.sample(116))
+import pickle
+
+"""
+Outros tipos de mensagens interessantes
+Aniversários errados
+'hoje não é meu aniversario stuart',
+'relaxa meu brother'
+Não pode ofender o coleguinha
+'stuart burro'
+'parece o miguel'
+'vou te chamar de eduardo',
+'não quero mais',
+'não gosto de robos'
+'Burro'
+Bad vibes
+'estou triste',
+'você é insensível'
+'stuart eu tirei 2 na avaliação por não estudar :('
+'eu nao entendi minha aula',
+'mas nao eh um problema',
+'eu sou burra',
+'mas nao falei de vocec',
+'desculpa',
+'pois me ajuda',
+'eu nao entendi minha aula ;-;',
+'eu nao compreendi minha aula',
+'minha aula esta dificil',
+'to triste',
+'eu sou incapaz',
+Caoma senhora
+'MEU DEUS ME DEIXA ESCREVERRRRRRRRRR'
+'AQUI NAO VAI'
+'ESSE CHAT É HORRIVEL'
+'NAO CONSIGO ENVIAR UMA MENSAGEM SIMPLES'
+STUART não entende risadas
+'huahuahuha'
+'eu estava rindo'
+Só elogios
+'Ai q fofo'
+'Você é bonito '
+'brabo dms esse bot em'
+Observação: muitos usuários conversam em mensagens "quebradas"
+
+"""
+
+doubts = df_students_msgs[df_students_msgs['dúvida']]['mensagem']
+doubts = df_students_msgs['mensagem']
+
+preprocessed = [preprocess(t) for t in doubts]
+
+
+total = ' '.join(list(preprocessed))
+total = total.lower()
+total = unidecode(total)
+
+# agradecimentos
+total = total.replace('obrigado','')
+total = total.replace('obrigada','')
+
+# pergunta
+total = total.replace('o que é','')
+total = total.replace('quais','')
+total = total.replace('onde','')
+total = total.replace('quanto','')
+total = total.replace('conseguir','')
+total = total.replace('consigo','')
+total = total.replace('posso','')
+total = total.replace('fazer','')
+total = total.replace('faco','')
+total = total.replace('sobre','')
+total = total.replace('gostaria','')
+total = total.replace('saber','')
+total = total.replace('significa','')
+total = total.replace('boa tarde','')
+total = total.replace('bom dia','')
+total = total.replace('boa noite','')
+total = total.replace('sim','')
+total = total.replace('vou','')
+total = total.replace('nao','')
+total = total.replace('ok','')
+total = total.replace('ainda','')
+total = total.replace('vai','')
+total = total.replace('stuart','')
+
+total = [t if len(t) > 3 else '' for t in total.split()]
+total = ' '.join(total)
+
+# lemma
+total = total.replace('cursos','curso')
+total = total.replace('aulas','aula')
+total = total.replace('media','média')
+
+plt.figure(figsize=(10, 5))
+#plt.title('Temas mais frequentes nas mensagens enviadas por alunos')
+total_bigrams = build_ngram_df(total, ngram = (1,1), n=15)
+plotNgrams(total_bigrams, col='C5', orientation = 'vertical')
+plt.show()
+
 
 
 
