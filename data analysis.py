@@ -782,6 +782,81 @@ df_students_msgs[df_students_msgs['saudação']]['mensagem'].sample(10).values
 print('compreensão:',df_students_msgs['compreensão'].sum())
 df_students_msgs[df_students_msgs['compreensão']]['mensagem'].sample(10).values
 
+"""
+Dúvidas peculiares
+Temas mais frequentes:
+Média/nota mínima
+Certificado
+Datas e prazos
+Resiliência
+Dúvidas sobre conteúdos dos cursos
+Erros no sistema ('Eu fiz a avaliação da aula 1.3 e não liberou a próxima aula, qual o motivo?')
+Usabilidade
+'Por que no Smartphone é mais difícil de acessar as aulas ?'
+'Oi boa tarde! Tem intérprete? Ou eu ir lá Dell ou ficar casa câmera web?'
+Corações apaixonados
+'vc é casado ?'
+'né que eu amo a Helena?'
+'vamos ser amigos?'
+Privacidade hackeada
+'você é monitorado?'
+STUART, a calculadora
+'quanto é a integral de uma função do tipo f(x)=2x + 1 ?'
+'quanto é 2+2'
+Que deselegante
+'e dai?'
+'meu *au é grande?'
+Pesado
+'Você é programado para falar sobre suicidio?'
+
+"""
+df_students_msgs.columns
+
+labels = ['apreciação','depreciação','dúvida', 'saudação', 'compreensão', 'problemas']
+values = []
+outros = pd.Series([True]*len(df_students_msgs))
+for l in labels:
+  value = df_students_msgs[l].sum()
+  values.append(value)
+  outros = outros & (df_students_msgs[l]==False).reset_index(drop=True)
+
+labels.append('outros')
+values.append(len(df_students_msgs[outros.values]))
+
+s = pd.Series(values, index=labels).sort_values(ascending=False)
+s
+
+annotate_barchart(s.values, s.index, title = None, size = (10,5), col='C6', rotate_xticks=False)
+
+outros_series = df_students_msgs[outros.values]['mensagem']
+print(len(outros_series))
+outros_series.sample(20).values
+
+request = df_students_msgs['dúvida'].reset_index(drop=True)  | df_students_msgs['problemas'].reset_index(drop=True)
+solved =  df_students_msgs['apreciação'].reset_index(drop=True)  |  df_students_msgs['compreensão'].reset_index(drop=True) 
+not_solved =  df_students_msgs['depreciação'].reset_index(drop=True) 
+
+val = [request.sum(),solved.sum(),not_solved.sum()]
+labels = ['Solicitação', 'Contentamento', 'Descontentamento']
+annotate_barchart(val, labels, title = None, size = (10,5), col='C7', rotate_xticks=False)
+
+req = df_students_msgs[list(request)]['mensagem']
+sol = df_students_msgs[list(solved)]['mensagem']
+not_sol = df_students_msgs[list(not_solved)]['mensagem']
+print('Exemplos de mensagem de solicitação:')
+print(list(req.sample(10)))
+print()
+print('Exemplos de mensagem de solicitação solucionada:')
+print(list(sol.sample(10)))
+print()
+print('Exemplos de mensagem de descontentamento:')
+print(list(not_sol.sample(10)))
+print()
+
+for p in list(sol.sample(100)):
+  print(p)
+
+  
 
 
 
