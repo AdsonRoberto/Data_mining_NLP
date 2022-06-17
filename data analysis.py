@@ -532,6 +532,258 @@ total_bigrams = build_ngram_df(total, ngram = (1,1), n=30, ascend=True)
 #plotNgrams(total_bigrams, col='C8', orientation = 'vertical')
 #plt.show()
 
+# analise de mensagens de gratiluz e dúvidas
+import string 
+punct = list(string.punctuation)
+#punct
+import pt_core_news_sm
+nlp = pt_core_news_sm.load()
+
+def remove_punct(text):
+  for p in punct:
+    text = text.replace(p,'')
+  return text
+
+
+def clean_text(text, punctuation = False):
+  if punctuation:
+    text = remove_punct(text) 
+  text = text.lower()
+  text = unidecode(text)
+  text = text.strip()
+  return text
+
+def is_query(text):
+  words = text.split()
+  if len(words) > 4 or len(words) < 1:
+    return False
+
+  if greeting(text) or understood(text) or appreciation(text) or negative(text):
+    return False
+
+  doc = nlp(text)
+  counter_noun = 0
+  for token in doc:
+    if token.pos_ == 'NOUN':
+      counter_noun += 1
+  noun_ratio = counter_noun/len(words)
+  if noun_ratio >= 0.5:
+    return True
+  else:
+    return False
+
+
+def is_thanks(text):
+  thanks_list = ['brigad','vlw','valeu','obg','thank','obrigdo','obrigada', 'thx']
+  og_text = text
+  text = clean_text(text)
+  for th in thanks_list:
+    if th in text and 'é obrigado' not in og_text: 
+      return True
+  return False
+
+def appreciation(text):
+  appreciation_list = ['!',
+                       'legal',
+                       'otimo',
+                       'bacana',
+                       'show',
+                       'muito bom', 
+                       ':)', 
+                       '^^', 
+                       'que bom', 
+                       'ebaa', 
+                       'uhu', 
+                       'kkk', 
+                       '\o/', 
+                       's2', 
+                       ';)', 
+                       'fofo', 
+                       ':-)', 
+                       ':d',
+                       ';)']
+
+  thanks_list = ['brigad',
+                 'vlw',
+                 'valeu',
+                 'obg',
+                 'thank',
+                 'obrigdo',
+                 'obrigada', 
+                 'thx']
+
+  appreciation_list += thanks_list
+  text = clean_text(text)
+  for ap in appreciation_list:
+    if ap in text and 'é obrigado' not in text: #and len(text.split() < 5): 
+      return True
+  return False
+
+def interrogation(text):
+  doubt_list = ['?', 
+                'queria saber', 
+                'como fa', 
+                'o que', 
+                'qual', 
+                'quanto', 
+                'quando', 
+                'que horas', 
+                'como', 
+                'oque', 
+                'quais', 
+                'onde', 
+                'how', 
+                'what is',
+                'quantas',
+                'tem mais',
+                'quem',
+                'duvida']
+  cl_text = clean_text(text)
+  for db in doubt_list:
+    if db in cl_text: 
+      return True  
+  # nouns
+  return is_query(cl_text)
+
+def understood(text):
+  oks = ['ok', 
+         'tudo bem', 
+         'certo', 
+         'sim', 
+         'yes', 
+         'positivo', 
+         'ah sim', 
+         'ah', 
+         'blz', 
+         'beleza', 
+         'eh', 
+         'entend',
+         '👍',
+         'isso']
+
+  text = clean_text(text, True)
+  for ok in oks:
+    if ok in text and len(text.split()) < 5: 
+      return True
+  return False
+
+def greeting(text):
+  greetings = ['ola',
+               'oi',
+               'oii',
+               'hello', 
+               'bom dia', 
+               'boa tarde', 
+               'bom dai', 
+               'boa noite', 
+               'tchau', 
+               'bye', 
+               'eae',
+               'abraco',
+               'te mais']
+
+  text = clean_text(text, True)
+  for ap in greetings:
+    if ap in text and len(text.split()) < 5: 
+      return True
+  return False
+
+def negative(text):
+  negatives = ['horr',
+               ':(', 
+               'ruim', 
+               'pessimo', 
+               'burr', 
+               'triste', 
+               'incapaz', 
+               'bugado', 
+               'dificil', 
+               'insensivel', 
+               'cansei', 
+               'cansado',  
+               'nao gosto', 
+               'nao quero', 
+               '¬¬',
+               'desanimado',
+               'estou mal',
+               'sinto mal',
+               'estress',
+               'burocra']
+
+# 'oque é uma notação hexadecimal?
+
+  text = clean_text(text)
+  for neg in negatives:
+    if neg in text:
+      return True
+  return False
+
+def trouble(text):
+  negatives = ['erro',
+              'nao consig',              
+              'nao estou conseguindo',
+              'sistema esta fora',
+              'travou',
+              'nao recebi',
+              'nao entend',
+              'nao compreendi',
+              'erro',
+              'errad',
+              'bug',
+              'pane',
+              'problema', 
+              'dificuldade',              
+              'nao vou conseguir',
+              'atrasa',
+              'nao funciona',
+              'forma errada',
+              'nao to conseguindo',
+              'nao consegui',
+              'incorret',
+               'nao entendi']
+  text = clean_text(text)
+  for neg in negatives:
+    if neg in text:
+      return True
+  return False
+  
+  
+
+    
+df_students_msgs = df[df['autor_da_mensagem'] !='STUART']
+#df_students_msgs['agradecimento'] = [is_thanks(text) for text in df_students_msgs.loc[:,'mensagem']]
+df_students_msgs['dúvida'] = [interrogation(text) for text in df_students_msgs['mensagem']] 
+df_students_msgs['apreciação'] = [appreciation(text) for text in df_students_msgs['mensagem']]
+df_students_msgs['depreciação'] =  [negative(text) for text in df_students_msgs['mensagem']]
+df_students_msgs['saudação'] = [greeting(text) for text in df_students_msgs['mensagem']]
+df_students_msgs['compreensão'] = [understood(text) for text in df_students_msgs['mensagem']]
+df_students_msgs['problemas'] = [trouble(text) for text in df_students_msgs['mensagem']]
+
+# apreciação
+print(df_students_msgs['apreciação'].sum())
+df_students_msgs[df_students_msgs['apreciação']]['mensagem'].sample(10).values
+#list(df_students_msgs[df_students_msgs['apreciação']]['mensagem'])
+
+# depreciação
+print(df_students_msgs['depreciação'].sum())
+df_students_msgs[df_students_msgs['depreciação']]['mensagem'].sample(20).values
+
+# dúvidas
+print(df_students_msgs['dúvida'].sum())
+df_students_msgs[df_students_msgs['dúvida']]['mensagem'].sample(20).values
+
+# trouble
+print(df_students_msgs['problemas'].sum())
+df_students_msgs[df_students_msgs['problemas']]['mensagem'].sample(20).values
+
+print('saudação:',df_students_msgs['saudação'].sum())
+df_students_msgs[df_students_msgs['saudação']]['mensagem'].sample(10).values
+
+print('compreensão:',df_students_msgs['compreensão'].sum())
+df_students_msgs[df_students_msgs['compreensão']]['mensagem'].sample(10).values
+
+
+
 
 
 
