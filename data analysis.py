@@ -1006,6 +1006,36 @@ df['id_aluno'] = df.apply(lambda x: get_student_id(x['remetente'], x['destinatar
 
 df.groupby(by=['id_aluno']).count()['remetente'].sort_values(ascending=False)
 
+#Recomendações
+
+print(len(df[df['recomendacao']==True]))
+df[df['recomendacao']==True]['avaliacao_usuario'].sum()
+
+rec = df[df['recomendacao']==True]['avaliacao_usuario'].value_counts()
+rec
+
+#
+plt.style.use('bmh')
+annotate_barchart(rec.values,['Sem avaliação','Avaliação positiva','Avaliação negativa'], title = 'Avaliação de recomendações', size = (10,5), col=['C4','C0','C1'], rotate_xticks=False)
+#plt.style.use('default')
+donnut(rec.values,['Sem avaliação','Avaliação positiva','Avaliação negativa'],col=['C4','C0','C1'])
+
+df.columns
+
+df.head(1)
+
+def query_list(query,text):
+  for q in query:
+    for t in text.split():
+      if t.startswith(q):
+        return True
+  return False
+
+bad_words = ['caralh','put','porra','foda','fod','fud','merda','bosta', 'pau', 'bucet', 'priquito']
+df[[query_list(bad_words,text) for text in df['mensagem'] ]]
+
+
+
 
 
 
