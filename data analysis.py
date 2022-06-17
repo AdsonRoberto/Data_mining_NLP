@@ -1034,6 +1034,67 @@ def query_list(query,text):
 bad_words = ['caralh','put','porra','foda','fod','fud','merda','bosta', 'pau', 'bucet', 'priquito']
 df[[query_list(bad_words,text) for text in df['mensagem'] ]]
 
+#Análise de sentimentos
+
+from textblob import TextBlob
+import time
+
+b = TextBlob('')
+b.sentiment.polarity
+
+len(df_students_msgs)/60
+
+def translate_sentiment(text):
+  b = TextBlob(text)
+  try:
+    if b.detect_language() != 'en':   
+      try:
+        b = b.translate()
+      except:
+        b = TextBlob('')
+  except:
+     b = TextBlob('')
+
+  polarity = b.sentiment.polarity
+  subjectivity = b.sentiment.subjectivity
+  translation = str(b)
+  return translation, polarity, subjectivity
+
+students_sent = '/content/drive/MyDrive/Mineracao/stuart_log_2021-01-25-17-12-00_sentiment.csv'
+df_students_msgs = pd.read_csv(students_sent)
+
+plt.figure(figsize=(15,6))
+plt.title('Distribuição de polaridade')
+sns.distplot(x=df_students_msgs['polaridade'],bins=25,kde=True)
+
+plt.figure(figsize=(15,6))
+plt.title('Distribuição de subjetividade')
+sns.distplot(x=df_students_msgs['subjetividade'],color='C1')
+
+def categorize_sentiment(pol):
+  if pol < -0.2:
+    return 'Negativo'
+  elif pol > 0.2:
+    return 'Positivo'
+  else:
+    return 'Neutro'
+df_students_msgs['sentimento'] = [categorize_sentiment(pol) for pol in df_students_msgs['polaridade']]
+
+pos = len(df_students_msgs[df_students_msgs['sentimento']=='Positivo'])
+neg = len(df_students_msgs[df_students_msgs['sentimento']=='Negativo'])
+neu = len(df_students_msgs[df_students_msgs['sentimento']=='Neutro'])
+
+#plt.style.use('default')
+plt.style.use('bmh')
+values = [pos, neg, neu]
+labels = ['Positivo', 'Negativo', 'Neutro']
+
+annotate_barchart(values,labels,title='Polaridade',col=['C3','C1','C2'])
+donnut(values, labels,col=['C3','C1','C2'])
+
+
+
+
 
 
 
