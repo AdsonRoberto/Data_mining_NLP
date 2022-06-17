@@ -389,3 +389,35 @@ for msg in list(df_stuart['mensagem']):
 print(counter)
 print('Dúvidas sobre conteúdo foram utilizadas {a:1d} vezes'.format(a=counter))
 print(counter/len(df)*100)
+
+#Serie temporal
+
+df['timestamp'] = pd.to_datetime(df['data_hora_mensagem']) #, format='%d/%m/%y %H:%M')
+frame = '24H'
+timeseries = df[df['autor_da_mensagem']!='STUART'].groupby('timestamp').count()['remetente']
+timeseries = timeseries.resample(frame).sum()
+
+print('Total de dias: ', len(timeseries))
+print('Média de mensagens enviadas para o STUART por dia:',timeseries.mean())
+
+fig = px.line(x=timeseries.index, y=timeseries.values)
+fig.show()
+
+df.sample(3)
+
+# stuart and students
+timeseries_stuart = df[df['autor_da_mensagem'] =='STUART'].groupby('timestamp').count()['remetente'].resample(frame).sum().to_frame()
+timeseries_users = df[df['autor_da_mensagem'] !='STUART'].groupby('timestamp').count()['remetente'].resample(frame).sum().to_frame()
+df_timeseries = pd.concat([timeseries_stuart,timeseries_users])
+df_timeseries['autor'] = ['STUART']*len(timeseries_stuart) + ['USUÁRIOS']*len(timeseries_users)
+df_timeseries.reset_index(level=0, inplace=True)
+
+print('Média de mensagens enviadas pelo STUART por dia:',timeseries_stuart.mean())
+print('Média de mensagens enviadas por alunos por dia:',timeseries_users.mean())
+
+fig = px.line(df_timeseries, x='timestamp', y='remetente',
+              color="autor", line_group="autor", hover_name="autor")
+fig.show()
+
+
+
