@@ -84,3 +84,13 @@ def donnut(values, labels, size = (10,8), col = None):
   p = plt.gcf()
   p.gca().add_artist(my_circle)
   plt.show()
+
+
+#Qte de msg
+size = len(df)
+nans = df['mensagem'].isna().sum()
+nan_ratio = (nans/size)*100 
+
+print('Total de mensagens: {a:1d}'.format(a=size))
+print('Total de mensagens nulas: {a:1d}'.format(a=nans))
+print('Porcentagem de mensagens nulas: {a:.2f}%'.format(a=nan_ratio))
