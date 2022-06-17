@@ -51,3 +51,36 @@ df = pd.concat(dfs)
 df['data_hora_mensagem'] = pd.to_datetime(df['data_hora_mensagem'])
 df = df.sort_values(by='data_hora_mensagem')
 df.head(3)
+
+df.sample(10)
+
+print(len(df))
+
+# create vertical barchart with annotation
+def annotate_barchart(values, labels, title, size = (8,5), col = None, rotate_xticks = False):
+  plt.figure(figsize = size)
+  plt.title(title)
+  if rotate_xticks:
+    plt.xticks(values, labels, rotation='vertical')
+  if type(col) == str or col == None:
+    g = sns.barplot(x=labels, y=values, color = col)
+  elif type(col) == list:
+    g = sns.barplot(x=labels, y=values, palette = col)
+    
+  for p in g.patches:
+      g.annotate(format(p.get_height(), '.0f'), (p.get_x() + p.get_width() / 2., 
+                                                p.get_height()), ha = 'center', 
+                va = 'center', xytext = (0, 5), textcoords = 'offset points')
+  plt.show()
+
+#clrs = ['grey' if (x < max(values)) else 'red' for x in values ]
+#sb.barplot(x=idx, y=values, palette=clrs) # color=clrs)
+
+# create donnut chart
+def donnut(values, labels, size = (10,8), col = None):
+  plt.figure(figsize=(8, 8))
+  my_circle = plt.Circle( (0,0), 0.6, color='white')
+  plt.pie(values, labels=labels, autopct='%1.1f%%',startangle=90, pctdistance=0.4, colors = col)
+  p = plt.gcf()
+  p.gca().add_artist(my_circle)
+  plt.show()
