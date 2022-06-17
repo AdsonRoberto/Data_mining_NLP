@@ -94,3 +94,5 @@ nan_ratio = (nans/size)*100
 print('Total de mensagens: {a:1d}'.format(a=size))
 print('Total de mensagens nulas: {a:1d}'.format(a=nans))
 print('Porcentagem de mensagens nulas: {a:.2f}%'.format(a=nan_ratio))
+
+df[df['autor_da_mensagem']!='STUART']['remetente'].nunique()
