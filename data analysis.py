@@ -959,6 +959,42 @@ plotNgrams(total_bigrams, col='C5', orientation = 'vertical')
 plt.show()
 
 
+#Localizando conversas pesquisando pelo texto
+
+def query_in(df,query):
+  messages = list(df['mensagem'])
+  match = []
+  query = query.lower()
+  for m in messages:
+    if query in m.lower():
+      match.append(True)
+    else:
+      match.append(False)
+  return df[match]
+
+def search_conversation(df, text, begin, end):
+  author = query_in(df,text)['autor_da_mensagem'].values[0]
+  sender = query_in(df,text)['remetente'].values[0]
+  reciever = query_in(df,text)['destinatario'].values[0]
+
+  # message sent by student; student = sender
+  if author != 'STUART':    
+    student = sender
+  # message sent by stuart. 
+  else:
+    student = reciever
+
+  df_conversation = df[(df['remetente']==student) | (df['destinatario']==student)].reset_index(drop=True) 
+  idx = query_in(df_conversation,text).index[0]
+  return df_conversation.loc[idx-begin:idx+end]
+
+text = 'CHAT.STUART_INFORMATION_USEFUL'
+#search_conversation(df,text,2,10)
+
+df[df['mensagem']=='CHAT.STUART_INFORMATION_USEFUL']
+
+
+
 
 
 
